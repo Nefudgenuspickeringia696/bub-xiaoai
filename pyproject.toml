@@ -8,12 +8,17 @@ authors = [
 ]
 requires-python = ">=3.13"
 dependencies = [
+    "aiohttp>=3.12.14",
+    "miservice-fork>=2.7.11",
     "tetos>=0.4.3",
 ]
 
+[project.entry-points.bub]
+xiaoai = "bub_xiaoai.plugin:XiaoAiPlugin"
+
 [build-system]
-requires = ["uv_build>=0.11.1,<0.12.0"]
-build-backend = "uv_build"
+requires = ["pdm-backend"]
+build-backend = "pdm.backend"
 
 [dependency-groups]
 dev = [
@@ -22,3 +27,6 @@ dev = [
 
 [tool.uv.sources]
 bub = { git = "https://github.com/bubbuild/bub.git" }
+
+[tool.pdm.build]
+includes = ["src/bub_xiaoai", "src/skills"]
