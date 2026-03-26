@@ -68,6 +68,7 @@ class XiaoAiMessageListener:
         self._session: ClientSession | None = None
         self._mina_service: MiNAService | None = None
         self._miio_service: MiIOService | None = None
+        self._lock = asyncio.Lock()
         self.static_server = TempStaticFileServer()
 
     async def __aenter__(self) -> XiaoAiMessageListener:
@@ -126,23 +127,27 @@ class XiaoAiMessageListener:
     async def listen(self) -> AsyncIterator[dict[str, Any]]:
         while True:
             message = await self.fetch_latest_message()
-            if message is not None:
+            if (
+                message is not None
+                and message.get("query", "").strip() != WAKEUP_KEYWORD
+            ):
                 yield message
             await asyncio.sleep(self.config.poll_interval)
 
     async def fetch_latest_message(self) -> dict[str, Any] | None:
-        timeout = ClientTimeout(total=self.config.request_timeout)
-        response = await self.session.get(
-            LATEST_ASK_API.format(
-                hardware=self.config.hardware,
-                timestamp=int(time.time() * 1000),
-            ),
-            headers={"Cookie": self._cookie_header},
-            timeout=timeout,
-        )
-        response.raise_for_status()
-        payload = await response.json()
-        return self._extract_message(payload)
+        async with self._lock:
+            timeout = ClientTimeout(total=self.config.request_timeout)
+            response = await self.session.get(
+                LATEST_ASK_API.format(
+                    hardware=self.config.hardware,
+                    timestamp=int(time.time() * 1000),
+                ),
+                headers={"Cookie": self._cookie_header},
+                timeout=timeout,
+            )
+            response.raise_for_status()
+            payload = await response.json()
+            return self._extract_message(payload)
 
     async def _login(self) -> None:
         if self.config.cookie:

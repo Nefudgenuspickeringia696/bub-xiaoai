@@ -2,14 +2,14 @@ from __future__ import annotations
 
 import asyncio
 from collections.abc import AsyncIterator
-from contextlib import asynccontextmanager, suppress
+from contextlib import asynccontextmanager
 from typing import Any
 
 from bub.channels import Channel, ChannelMessage
 from bub.types import MessageHandler
 from loguru import logger
 
-from .mi import WAKEUP_KEYWORD, XiaoAiMessageListener
+from .mi import XiaoAiMessageListener
 
 
 class XiaoAiChannel(Channel):
@@ -25,9 +25,6 @@ class XiaoAiChannel(Channel):
         await self.listener.stop_if_xiaoai_is_playing()
         yield
         await self.listener.wait_for_tts_finish()
-        with suppress(Exception):
-            await self.listener.wakeup_xiaoai()
-            await self.listener.stop_if_xiaoai_is_playing()
 
     async def start(self, stop_event: asyncio.Event) -> None:
         self._ongoing_task = asyncio.create_task(self._main_loop())
@@ -60,8 +57,6 @@ class XiaoAiChannel(Channel):
             async with self.listener as listener:
                 async for msg in listener.listen():
                     query = msg["query"].strip()
-                    if query == WAKEUP_KEYWORD:
-                        continue
                     logger.info("channel.xiaoai: received message: {}", query)
                     await self.on_receive(self._build_message(msg))
         finally:
