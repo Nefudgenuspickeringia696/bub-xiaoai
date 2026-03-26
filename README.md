@@ -1,4 +1,4 @@
-# bub-xiaoai
+# Bub 🧡 XiaoAi
 
 `bub-xiaoai` is a [Bub](https://github.com/bubbuild/bub) channel plugin for Xiaomi XiaoAi speakers.
 
