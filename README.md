@@ -45,7 +45,7 @@ The channel currently runs in continuous conversation mode by default:
 ### Install the plugin to your Bub environment:
 
 ```bash
-uv pip install git+https://github.com/frostming/bub-xiaoai.git
+uv pip install git+https://github.com/bubbuild/bub-xiaoai.git
 ```
 
 ## Configuration
