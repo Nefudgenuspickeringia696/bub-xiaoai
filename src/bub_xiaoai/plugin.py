@@ -21,7 +21,7 @@ class XiaoAiPlugin:
         settings = load_settings()
         self.framework = framework
         self.listener = XiaoAiMessageListener(
-            XiaoAiSettings(mi_token_home=settings.home / "mi_token.json")
+            XiaoAiSettings(token_home=settings.home / "mi_token.json")
         )
 
     @hookimpl

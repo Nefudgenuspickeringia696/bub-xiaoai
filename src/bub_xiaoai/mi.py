@@ -53,7 +53,7 @@ class XiaoAiSettings(BaseSettings):
     password: str = ""
     mi_did: str = ""
     cookie: str = ""
-    mi_token_home: Path = DEFAULT_MI_TOKEN_HOME
+    token_home: Path = DEFAULT_MI_TOKEN_HOME
     poll_interval: float = 1.0
     request_timeout: float = 15.0
     chat_id: str = "xiaoai-chat"
@@ -156,7 +156,7 @@ class XiaoAiMessageListener:
             self.session,
             self.config.account,
             self.config.password,
-            str(self.config.mi_token_home),
+            str(self.config.token_home),
         )
         ok = await account.login("micoapi")
         if not ok:
@@ -206,13 +206,13 @@ class XiaoAiMessageListener:
             self.device_id = cookies["deviceId"]
             return self.config.cookie
 
-        if not self.config.mi_token_home.exists():
+        if not self.config.token_home.exists():
             raise RuntimeError(
-                f"token file not found: {self.config.mi_token_home}; login did not "
+                f"token file not found: {self.config.token_home}; login did not "
                 "produce a usable token file"
             )
 
-        with self.config.mi_token_home.open(encoding="utf-8") as file:
+        with self.config.token_home.open(encoding="utf-8") as file:
             user_data = json.load(file)
         try:
             user_id = user_data["userId"]
