@@ -9,7 +9,7 @@ from typing import Any, AsyncIterator
 
 from aiohttp import ClientSession, ClientTimeout
 from loguru import logger
-from miservice import MiAccount, MiIOService, MiNAService, miio_command
+from miservice import MiAccount, MiIOService, MiNAService, MiTokenStore, miio_command
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
 from .static_server import TempStaticFileServer
@@ -43,6 +43,12 @@ HARDWARE_COMMAND_DICT = {
 }
 
 DEFAULT_COMMAND = ("5-1", "5-5")
+
+
+class PatchMiTokenStore(MiTokenStore):
+    def save_token(self, token=None):
+        if token is not None:
+            return super().save_token(token)
 
 
 class XiaoAiSettings(BaseSettings):
@@ -156,7 +162,7 @@ class XiaoAiMessageListener:
             self.session,
             self.config.account,
             self.config.password,
-            str(self.config.token_home),
+            PatchMiTokenStore(str(self.config.token_home)),
         )
         ok = await account.login("micoapi")
         if not ok:
